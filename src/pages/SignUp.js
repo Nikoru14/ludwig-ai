@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Row, Col, Form, Button, Container, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBackward } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const SignUp = () => {
@@ -11,6 +11,7 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [validationErrors, setValidationErrors] = useState({});
+    const navigate = useNavigate(); // Instance of useNavigate
 
     const validateEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -41,14 +42,13 @@ const SignUp = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in 
-                const user = userCredential.user;
-                // Redirect or update UI
+                // Redirect to the protected page
+                navigate('/protected');
             })
             .catch((error) => {
                 setError(error.message);
             });
     };
-
     return (
         <Container>
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>

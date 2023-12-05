@@ -1,17 +1,34 @@
 import { Button } from "react-bootstrap";
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import LoginModal from "../components/LoginModal";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from '../AuthContext';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
 
 const Home = () => {
 
     const [modalShow, setModalShow] = useState(false);
+    const { setIsAuthenticated, setUserEmail } = useContext(AuthContext);
+    const navigate = useNavigate(); // Instance of useNavigate
 
-    const handleModalSubmit = (name) => {
-        // Handle the name submitted from the modal
-        console.log("Name submitted: ", name);
-        // Additional logic here
+    const handleLoginSubmit = async (email, password) => {
+        try {
+            const auth = getAuth();
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+            // Handle successful login
+            setIsAuthenticated(true);
+            setUserEmail(userCredential.user.email);
+            setModalShow(false); // Close the modal on successful login
+            navigate("/protected");
+        } catch (error) {
+            console.error("Login error: ", error.message);
+            // Handle login failure
+            // Update state or UI to reflect the error
+        }
     };
+
 
     return (
         <div id="page-wrapper">
@@ -45,7 +62,7 @@ const Home = () => {
                             <LoginModal
                                 show={modalShow}
                                 onHide={() => setModalShow(false)}
-                                onSubmit={handleModalSubmit}
+                                onSubmit={handleLoginSubmit} // Passing the function as a prop
                             />
                         </li>
                         <li><Link to="/signup" className="button secondary">Sign Up</Link></li>

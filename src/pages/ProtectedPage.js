@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../AuthContext';
+import { getAuth, signOut } from 'firebase/auth';
 
-const ProtectedPage = ({ userEmail, onLogout }) => {
+const ProtectedPage = () => {
+    const { isAuthenticated, userEmail, setIsAuthenticated, setUserEmail } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
     const handleLogout = () => {
-        onLogout(); // Perform logout logic
-        navigate('/'); // Redirect to home
+        const auth = getAuth();
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            setIsAuthenticated(false);
+            setUserEmail('');
+            navigate('/');
+        }).catch((error) => {
+            // An error happened.
+            console.error('Logout error:', error);
+        });
     };
+
+    if (!isAuthenticated) {
+        // Optionally, render a loading spinner or a redirect message
+        return null;
+    }
 
     return (
         <div>
