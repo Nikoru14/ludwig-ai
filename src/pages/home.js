@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import LoginModal from "../components/LoginModal";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from '../AuthContext';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from 'firebase/auth';
 
 
 const Home = () => {
@@ -15,6 +15,7 @@ const Home = () => {
     const handleLoginSubmit = async (email, password) => {
         try {
             const auth = getAuth();
+            setPersistence(auth, browserSessionPersistence)
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
             // Handle successful login

@@ -66,7 +66,7 @@ const LoginModal = (props) => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" type="submit" disabled={loading}>
+          <Button variant="primary" type='submit' disabled={loading}>
             {loading ? 'Logging in...' : 'Log In'}
           </Button>
         </Modal.Footer>

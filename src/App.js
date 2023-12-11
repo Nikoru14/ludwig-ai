@@ -3,18 +3,21 @@ import Home from './pages/home';
 import SignUp from './pages/SignUp';
 import ProtectedPage from './pages/ProtectedPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { AuthProvider } from './AuthContext';
 
 const App = () => {
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/protected" element={<ProtectedPage />} />
-        {/* Additional routes can be added here */}
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route exact path="/signup" element={<SignUp />} />
+          <Route exact path="/protected" element={<ProtectedPage />} />
+          {/* Additional routes can be added here */}
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 
