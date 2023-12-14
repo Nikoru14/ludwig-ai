@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 
 const LoginModal = ({ externalError, setExternalError, ...props }) => {
   const [email, setEmail] = useState('');
@@ -70,10 +71,13 @@ const LoginModal = ({ externalError, setExternalError, ...props }) => {
             />
           </Form.Group>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{ justifyContent: "center" }}>
           <Button style={{ fontWeight: "bold" }} variant="primary" type='submit' disabled={loading}>
             {loading ? 'Logging in...' : 'Log In'}
           </Button>
+          <div>
+            Don't have An Account? <Link to="/signup"> Sign Up!</Link>
+          </div>
         </Modal.Footer>
       </Form>
     </Modal>
