@@ -3472,3 +3472,106 @@ body.index #main {
 	}
 
 }
+
+/* CSS */
+.navbar-protected {
+	display: flex;
+	align-items: center;
+	background-color: #424242;
+	color: white;
+	padding: 0 20px;
+}
+
+.navbar-p-content {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.navbar-left {
+	display: flex;
+	align-items: center;
+	justify-items: auto;
+}
+
+.navbar-right {
+	display: flex;
+	align-items: center;
+}
+
+.back-button,
+.hide-email-button,
+.logout-button {
+	background: none;
+	color: white;
+	cursor: pointer;
+}
+
+.button-icon {
+	font-size: 15px;
+	/* Adjust the size as needed */
+}
+
+.back-button {
+	padding-right: 50px;
+}
+
+.hide-email-button {
+	padding-left: 20px;
+}
+
+.logout-button {
+	font-weight: bold;
+	border: 3.5px solid white;
+	padding: 5px 15px;
+	/* Add padding to maintain button size */
+	border-radius: 4px;
+	/* Rounded corners for the button */
+	background: none;
+	color: white;
+	cursor: pointer;
+	margin-left: auto;
+	/* Pushes the logout button to the right */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+.logout-button:hover {
+	background-color: red;
+	border-color: red;
+}
+
+.iframe-main {
+	width: 100%;
+	height: calc(100vh - 30px);
+	/* Full viewport height minus the navbar height */
+	border: none;
+	/* Optional: removes the border */
+}
+
+.red-button {
+	font-weight: bold;
+	background-color: red;
+}
+
+.modal-header {
+	position: relative;
+	/* Ensure the header is positioned relative */
+}
+
+.close-button {
+	position: absolute;
+	/* Position the close button absolutely relative to the header */
+	top: 0;
+	right: 0;
+	border: none;
+	/* Optional: remove the border if there's one */
+	background: none;
+	/* Optional: remove the background if there's one */
+	font-size: 2.5rem;
+	/* Optional: adjust the size as needed */
+
+	padding-right: 20px;
+}

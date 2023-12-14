@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
-const LoginModal = (props) => {
+const LoginModal = ({ externalError, setExternalError, ...props }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -39,10 +39,15 @@ const LoginModal = (props) => {
   return (
     <Modal {...props} size="md" aria-labelledby="contained-modal-title-vcenter" centered>
       <Form onSubmit={handleSubmit}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Log In</Modal.Title>
+          <div type="button" className="close-button" onClick={props.onHide}>
+            &times; {/* This is a common symbol used for close buttons */}
+          </div>
         </Modal.Header>
         <Modal.Body>
+          {/* Use externalError to display error passed from parent */}
+          {externalError && <Alert variant="danger">{externalError}</Alert>}
           {error && <Alert variant="danger">{error}</Alert>}
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -66,7 +71,7 @@ const LoginModal = (props) => {
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" type='submit' disabled={loading}>
+          <Button style={{ fontWeight: "bold" }} variant="primary" type='submit' disabled={loading}>
             {loading ? 'Logging in...' : 'Log In'}
           </Button>
         </Modal.Footer>

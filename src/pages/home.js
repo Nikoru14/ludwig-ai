@@ -1,16 +1,29 @@
-import { Button } from "react-bootstrap";
-import React, { useState, useContext } from 'react';
-import LoginModal from "../components/LoginModal";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from 'firebase/auth';
-
+import { getAuth, signInWithEmailAndPassword, browserSessionPersistence, setPersistence, onAuthStateChanged, signOut } from 'firebase/auth';
+import LoginModal from "../components/LoginModal";
+import { Button } from "react-bootstrap";
 
 const Home = () => {
-
     const [modalShow, setModalShow] = useState(false);
-    const { setIsAuthenticated, setUserEmail } = useContext(AuthContext);
-    const navigate = useNavigate(); // Instance of useNavigate
+    const { isAuthenticated, setIsAuthenticated, userEmail, setUserEmail } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const [loginError, setLoginError] = useState('');
+
+    // Check authentication state on component mount
+    useEffect(() => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setIsAuthenticated(true);
+                setUserEmail(user.email);
+            } else {
+                setIsAuthenticated(false);
+                setUserEmail('');
+            }
+        });
+    }, [setIsAuthenticated, setUserEmail]);
 
     const handleLoginSubmit = async (email, password) => {
         try {
@@ -22,7 +35,7 @@ const Home = () => {
             setIsAuthenticated(true);
             setUserEmail(userCredential.user.email);
             setModalShow(false); // Close the modal on successful login
-            navigate("/protected");
+            // navigate("/main-app");
         } catch (error) {
             console.error("Login error: ", error.message);
             // Handle login failure
@@ -30,49 +43,69 @@ const Home = () => {
         }
     };
 
+    const handleAppButtonClick = () => {
+        if (isAuthenticated) {
+            navigate('/main-app');
+        } else {
+            setLoginError("You have to log in first to access the app");
+            setModalShow(true);
+        }
+    };
 
+    // Function to display the user's email with masked characters
+    const getDisplayEmail = () => {
+        if (!userEmail) return '';
+        const atIndex = userEmail.indexOf('@');
+        if (atIndex === -1) return userEmail; // No '@' found
+
+        const firstChar = userEmail[0];
+        const lastCharBeforeAt = userEmail[atIndex - 1];
+        const maskedPart = '*'.repeat(atIndex - 2);
+        return `${firstChar}${maskedPart}${lastCharBeforeAt}${userEmail.substring(atIndex)}`;
+    };
+
+    // Function to handle logout
+    const handleLogout = async () => {
+        try {
+            await signOut(getAuth());
+            setIsAuthenticated(false);
+            setUserEmail('');
+            // Optionally navigate to a different page upon logout
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
     return (
         <div id="page-wrapper">
-
             {/* <!-- Header --> */}
             <header id="header" className="alt">
                 <h1 id="logo"><Link to="/">Ludwig <span>von</span> AI</Link></h1>
                 <nav id="nav">
                     <ul>
-                        <li className="current"><Link to={"/"}>Welcome</Link></li>
-                        {/* <li className="submenu">
-                            <a href="#">Layouts</a>
-                            <ul>
-                                <li><a href="left-sidebar.html">Left Sidebar</a></li>
-                                <li><a href="right-sidebar.html">Right Sidebar</a></li>
-                                <li><a href="no-sidebar.html">No Sidebar</a></li>
-                                <li><a href="contact.html">Contact</a></li>
-                                <li className="submenu">
-                                    <a href="#">Submenu</a>
-                                    <ul>
-                                        <li><a href="#">Dolore Sed</a></li>
-                                        <li><a href="#">Consequat</a></li>
-                                        <li><a href="#">Lorem Magna</a></li>
-                                        <li><a href="#">Sed Magna</a></li>
-                                        <li><a href="#">Ipsum Nisl</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li> */}
-                        <li><Button onClick={() => setModalShow(true)} className="button primary">Log In</Button>
-                            <LoginModal
-                                show={modalShow}
-                                onHide={() => setModalShow(false)}
-                                onSubmit={handleLoginSubmit} // Passing the function as a prop
-                            />
-                        </li>
-                        <li><Link to="/signup" className="button secondary">Sign Up</Link></li>
+                        <li className="current"><Link to="/">Welcome</Link></li>
+                        {isAuthenticated ? (
+                            <>
+                                <li><span style={{ fontWeight: "bold" }}>Account: {getDisplayEmail()}</span></li>
+                                <li><Button style={{ backgroundColor: "red" }} onClick={handleLogout} className="red-button">Log Out</Button></li>
+                            </>
+                        ) : (
+                            <>
+                                <li><Button onClick={() => { setModalShow(true); setLoginError(""); }} className="button primary">Log In</Button></li>
+                                <li><Link to="/signup" className="button secondary">Sign Up</Link></li>
+                            </>
+                        )}
                     </ul>
                 </nav>
             </header>
-
+            <LoginModal
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                onSubmit={handleLoginSubmit}
+                externalError={loginError}
+                setExternalError={setLoginError}
+            />
             {/* <!-- Banner --> */}
-            <section id="banner">
+            <section id="banner" style={{ paddingBottom: "200px" }}>
                 {/* 
                 <!--
                 ".inner" is set up as an inline-block so it automatically expands
@@ -103,30 +136,32 @@ const Home = () => {
             </section>
 
             {/* <!-- Main --> */}
-            <article id="main">
-
+            <article id="main" style={{ marginTop: "-150px" }}>
                 <header className="special container">
-                    <span className="icon solid fa-chart-bar"></span>
-                    <h2>As this is my <strong>twentieth</strong> freebie for HTML5 UP
+                    <span className="fa-solid fa-piano-keyboard" style={{ fontSize: '100px' }}></span>
+                    <h2>Discover <strong>Ludwig Von AI</strong>, Your AI-Powered Composition Assistant</h2>
+                    <p>Step into the future of music with <strong>Ludwig Von AI</strong>.
                         <br />
-                        I decided to give it a really creative name.</h2>
-                    <p>Turns out <strong>Twenty</strong> was the best I could come up with. Anyway, lame name aside,
+                        Our advanced web-MIDI application doesn't just play and record MIDI
                         <br />
-                        it's minimally designed, fully responsive, built on HTML5/CSS3,
-                        and, like all my stuff,
+                        it breathes life into your piano compositions. With innovative LSTM-based AI models trained on a vast array of melodies,
                         <br />
-                        released for free under the <a href="http://html5up.net/license">Creative Commons Attribution 3.0</a> license. Have fun!</p>
+                        Ludwig Von AI can generate new tunes from your initial notes, helping you overcome any creative block.</p>
+                    <br />
+                    <a onClick={handleAppButtonClick} className="button"> Check out our Web Application!</a>
+
                 </header>
 
                 {/* <!-- One --> */}
-                <section className="wrapper style2 container special-alt">
-                    <div className="row gtr-50">
+                <section className="wrapper style2 container special-alt" style={{ backgroundColor: "black" }}>
+                    <div className="row gtr-50" style={{ marginLeft: "20px" }}>
                         <div className="col-8 col-12-narrower">
 
                             <header>
-                                <h2>Behold the <strong>icons</strong> that visualize what you’re all about. or just take up space. your call bro.</h2>
+                                <h2>Interactive, Intuitive, Inspirational</h2>
                             </header>
-                            <p>Sed tristique purus vitae volutpat ultrices. Aliquam eu elit eget arcu comteger ut fermentum lorem. Lorem ipsum dolor sit amet. Sed tristique purus vitae volutpat ultrices. eu elit eget commodo. Sed tristique purus vitae volutpat ultrices. Aliquam eu elit eget arcu commodo.</p>
+                            <br />
+                            <p>Whether you're looking to capture your spontaneous musical ideas, refine them, or explore uncharted melodic territories, <strong>Ludwig Von AI</strong> is your go-to companion. Connect your MIDI device, let your fingers dance on the keys, and watch as the AI harmoniously extends your melody. It's not just a tool—it's your creative partner in the art of music-making.</p>
                             <footer>
                                 <ul className="buttons">
                                     <li><a href="#" className="button">Find Out More</a></li>
@@ -137,12 +172,12 @@ const Home = () => {
                         <div className="col-4 col-12-narrower imp-narrower">
 
                             <ul className="featured-icons">
-                                <li><span className="icon fa-clock"><span className="label">Feature 1</span></span></li>
-                                <li><span className="icon solid fa-volume-up"><span className="label">Feature 2</span></span></li>
-                                <li><span className="icon solid fa-laptop"><span className="label">Feature 3</span></span></li>
-                                <li><span className="icon solid fa-inbox"><span className="label">Feature 4</span></span></li>
-                                <li><span className="icon solid fa-lock"><span className="label">Feature 5</span></span></li>
-                                <li><span className="icon solid fa-cog"><span className="label">Feature 6</span></span></li>
+                                <li><span className="fa-regular fa-microchip-ai" style={{ fontSize: "150px" }}></span></li>
+                                <li><span className="fa-solid fa-file-music" style={{ fontSize: "150px" }}></span></li>
+                                <li><span className="fa-duotone fa-list-music" style={{ fontSize: "150px" }}></span></li>
+                                <li><span className="fa-regular fa-play" style={{ fontSize: "150px" }}></span></li>
+                                <li><span className="fa-regular fa-brain-circuit" style={{ fontSize: "150px" }}></span></li>
+                                <li><span className="fa-duotone fa-cloud-binary" style={{ fontSize: "150px" }}></span></li>
                             </ul>
 
                         </div>
@@ -153,104 +188,87 @@ const Home = () => {
                 <section className="wrapper style1 container special">
                     <div className="row">
                         <div className="col-4 col-12-narrower">
-
                             <section>
-                                <span className="icon solid featured fa-check"></span>
+                                <span className="icon solid featured fa-music"></span>
                                 <header>
-                                    <h3>This is Something</h3>
+                                    <h3>Compose with AI</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat ultrices. Aliquam eu elit eget arcu commodo suscipit dolor nec nibh. Proin a ullamcorper elit, et sagittis turpis. Integer ut fermentum.</p>
+                                <p>Unleash your musical potential with Ludwig Von AI's intelligent composition tools. Let AI be your muse and guide your creative journey.</p>
                             </section>
-
                         </div>
                         <div className="col-4 col-12-narrower">
-
                             <section>
-                                <span className="icon solid featured fa-check"></span>
+                                <span className="icon solid featured fa-brain"></span>
                                 <header>
-                                    <h3>Also Something</h3>
+                                    <h3>Smart MIDI Integration</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat ultrices. Aliquam eu elit eget arcu commodo suscipit dolor nec nibh. Proin a ullamcorper elit, et sagittis turpis. Integer ut fermentum.</p>
+                                <p>Connect and interact with MIDI devices seamlessly. Record and perfect your pieces with a smart, responsive interface.</p>
                             </section>
-
                         </div>
                         <div className="col-4 col-12-narrower">
-
                             <section>
-                                <span className="icon solid featured fa-check"></span>
+                                <span className="icon solid featured fa-robot"></span>
                                 <header>
-                                    <h3>Probably Something</h3>
+                                    <h3>Creative AI Models</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat ultrices. Aliquam eu elit eget arcu commodo suscipit dolor nec nibh. Proin a ullamcorper elit, et sagittis turpis. Integer ut fermentum.</p>
+                                <p>Explore new horizons in music with our LSTM-based AI models that can generate melodies and inspire new compositions.</p>
                             </section>
-
                         </div>
                     </div>
                 </section>
 
                 {/* <!-- Three --> */}
                 <section className="wrapper style3 container special">
-
                     <header className="major">
-                        <h2>Next look at this <strong>cool stuff</strong></h2>
+                        <h2>Unleash Your Musical Imagination</h2>
                     </header>
-
                     <div className="row">
                         <div className="col-6 col-12-narrower">
-
                             <section>
-                                <a href="#" className="image featured"><img src="images/pic01.jpg" alt="" /></a>
+                                <a href="#" className="image featured"><img src="images/pic01.jpg" alt="Innovative Interface" /></a>
                                 <header>
-                                    <h3>A Really Fast Train</h3>
+                                    <h3>Innovative Interface</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
+                                <p>Engage with a platform where ease of use meets the cutting edge. Our user-friendly interface ensures your focus stays on creativity.</p>
                             </section>
-
                         </div>
                         <div className="col-6 col-12-narrower">
-
                             <section>
-                                <a href="#" className="image featured"><img src="images/pic02.jpg" alt="" /></a>
+                                <a href="#" className="image featured"><img src="images/pic02.jpg" alt="AI-Assisted Composition" /></a>
                                 <header>
-                                    <h3>An Airport Terminal</h3>
+                                    <h3>AI-Assisted Composition</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
+                                <p>Let artificial intelligence be your muse. Our advanced LSTM models offer musical insights and ideas, pushing the boundaries of your creativity.</p>
                             </section>
-
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-6 col-12-narrower">
-
                             <section>
-                                <a href="#" className="image featured"><img src="images/pic03.jpg" alt="" /></a>
+                                <a href="#" className="image featured"><img src="images/pic03.jpg" alt="Rich MIDI Integration" /></a>
                                 <header>
-                                    <h3>Hyperspace Travel</h3>
+                                    <h3>Seamless MIDI Input</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
+                                <p>Experience seamless integration with your MIDI setup. Record, and play back with a full suite of tools that speak the language of music.</p>
                             </section>
-
                         </div>
                         <div className="col-6 col-12-narrower">
-
                             <section>
-                                <a href="#" className="image featured"><img src="images/pic04.jpg" alt="" /></a>
+                                <a href="#" className="image featured"><img src="images/pic04.jpg" alt="Immersive Musical Experience" /></a>
                                 <header>
-                                    <h3>And Another Train</h3>
+                                    <h3>Immersive Musical Experience</h3>
                                 </header>
-                                <p>Sed tristique purus vitae volutpat commodo suscipit amet sed nibh. Proin a ullamcorper sed blandit. Sed tristique purus vitae volutpat commodo suscipit ullamcorper sed blandit lorem ipsum dolore.</p>
+                                <p>Immerse yourself in a world where music and technology converge, resulting in a harmonious blend of sound and innovation.</p>
                             </section>
-
                         </div>
                     </div>
-
                     <footer className="major">
                         <ul className="buttons">
-                            <li><a href="#" className="button">See More</a></li>
+                            <li><a href="#" className="button">Explore More</a></li>
                         </ul>
                     </footer>
-
                 </section>
+
 
             </article>
 
@@ -263,8 +281,8 @@ const Home = () => {
                 </header>
                 <footer>
                     <ul className="buttons">
-                        <li><a href="#" className="button primary">Take My Money</a></li>
-                        <li><a href="#" className="button">LOL Wut</a></li>
+                        <li><div onClick={handleAppButtonClick} className="button primary">Try our App</div></li>
+                        <li><a href="#" className="button">Back to Top ^</a></li>
                     </ul>
                 </footer>
 
@@ -278,16 +296,16 @@ const Home = () => {
                     <li><a href="#" className="icon brands circle fa-facebook-f"><span className="label">Facebook</span></a></li>
                     <li><a href="#" className="icon brands circle fa-google-plus-g"><span className="label">Google+</span></a></li>
                     <li><a href="#" className="icon brands circle fa-github"><span className="label">Github</span></a></li>
-                    <li><a href="#" className="icon brands circle fa-dribbble"><span className="label">Dribbble</span></a></li>
+                    <li><a href="#" className="icon brands circle fa-discord"><span className="label">Dribbble</span></a></li>
                 </ul>
 
                 <ul className="copyright">
-                    <li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                    <li>&copy; Ludwig</li>
                 </ul>
 
             </footer>
 
-        </div>
+        </div >
     );
 };
 
