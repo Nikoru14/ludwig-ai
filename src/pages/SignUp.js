@@ -108,10 +108,12 @@ const SignUp = () => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                     <br />
+                                    <div style={{ justifyItems: "center" }}>
+                                        <Button variant="primary" type="submit" className='primary button'>
+                                            Sign Up
+                                        </Button>
+                                    </div>
 
-                                    <Button variant="primary" type="submit" className='primary button'>
-                                        Submit
-                                    </Button>
                                 </Form>
                             </Card.Body>
                         </Col>

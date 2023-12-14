@@ -274,18 +274,16 @@ const Home = () => {
 
             {/* <!-- CTA --> */}
             <section id="cta">
-
                 <header>
-                    <h2>Ready to do <strong>something</strong>?</h2>
-                    <p>Proin a ullamcorper elit, et sagittis turpis integer ut fermentum.</p>
+                    <h2>Embark on Your<strong> AI-Powered </strong> Musical Journey</h2>
+                    <p>Discover a new realm of musical possibilities with Ludwig von AI. Are you ready to transform the way you compose and play music?</p>
                 </header>
                 <footer>
                     <ul className="buttons">
-                        <li><div onClick={handleAppButtonClick} className="button primary">Try our App</div></li>
-                        <li><a href="#" className="button">Back to Top ^</a></li>
+                        <li><div onClick={handleAppButtonClick} className="button primary">Explore Ludwig von AI</div></li>
+                        <li><a href="#header" className="button">Back to Top ^</a></li>
                     </ul>
                 </footer>
-
             </section>
 
             {/* <!-- Footer --> */}
@@ -296,7 +294,7 @@ const Home = () => {
                     <li><a href="#" className="icon brands circle fa-facebook-f"><span className="label">Facebook</span></a></li>
                     <li><a href="#" className="icon brands circle fa-google-plus-g"><span className="label">Google+</span></a></li>
                     <li><a href="#" className="icon brands circle fa-github"><span className="label">Github</span></a></li>
-                    <li><a href="#" className="icon brands circle fa-discord"><span className="label">Dribbble</span></a></li>
+                    <li><a href="#" className="icon brands circle fa-discord"><span className="label">Discord</span></a></li>
                 </ul>
 
                 <ul className="copyright">
