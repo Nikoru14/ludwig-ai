@@ -57,7 +57,7 @@ const SignUp = () => {
             .then((userCredential) => {
                 // Signed in 
                 // Redirect to the protected page
-                navigate('/protected');
+                navigate('/main-app');
             })
             .catch((error) => {
                 setError(error.message);
