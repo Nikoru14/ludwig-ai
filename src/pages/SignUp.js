@@ -55,9 +55,7 @@ const SignUp = () => {
         const auth = getAuth();
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                // Signed in 
-                // Redirect to the protected page
-                navigate('/main-app');
+                navigate('/home');
             })
             .catch((error) => {
                 setError(error.message);

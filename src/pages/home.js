@@ -52,6 +52,15 @@ const Home = () => {
         }
     };
 
+    const handleDiscordButtonClick = () => {
+        if (isAuthenticated) {
+            window.open("https://discord.gg/quqVtffqpy");
+        } else {
+            setLoginError("You have to log in first access our Discord Server invite link");
+            setModalShow(true);
+        }
+    };
+
     // Function to display the user's email with masked characters
     const getDisplayEmail = () => {
         if (!userEmail) return '';
@@ -268,8 +277,19 @@ const Home = () => {
                         </ul>
                     </footer>
                 </section>
+                {/* <!-- Main --> */}
+                <section id="main" style={{ backgroundColor: "#7289DA", color: "white" }}>
+                    <header className="special container">
+                        <span className="fa-brands fa-discord" style={{ fontSize: '100px' }}></span>
+                        <h2>Joiin Our <strong>Discord Community Server</strong>, Your AI-Powered Composition Assistant</h2>
+                        <p /> Discuss with fellow composers, pianists, musicians, and music enthusiasts
+                        <br /> within our<strong>Ludwig Von AI</strong> Community Server.
+                        <br />
+                        <br />
+                        <a onClick={handleDiscordButtonClick} className="button"> Join Now!</a>
 
-
+                    </header>
+                </section>
             </article>
 
             {/* <!-- CTA --> */}
@@ -294,7 +314,7 @@ const Home = () => {
                     <li><a href="#" className="icon brands circle fa-facebook-f"><span className="label">Facebook</span></a></li>
                     <li><a href="#" className="icon brands circle fa-google-plus-g"><span className="label">Google+</span></a></li>
                     <li><a href="#" className="icon brands circle fa-github"><span className="label">Github</span></a></li>
-                    <li><a href="#" className="icon brands circle fa-discord"><span className="label">Discord</span></a></li>
+                    <li><a onClick={handleDiscordButtonClick} className="icon brands circle fa-discord"><span className="label">Discord</span></a></li>
                 </ul>
 
                 <ul className="copyright">
